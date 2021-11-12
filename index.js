@@ -1,10 +1,10 @@
 require('dotenv').config();
 const bodyParser = require('body-parser');
-
+const md5 = require('md5');
 const express = require('express');
 const UserModel = require('./model/user');
 const app = express();
-const port = 4009;
+const port = 4007;
 console.log(process.env.API_KEY);
 const path = require('path');
 const cookieParser = require('cookie-parser');
@@ -27,11 +27,12 @@ app.get('/register', (req, res) => {
     res.render('register');
 });
 app.post('/create-user', (req, res) => {
-    const SaveUser = new UserModel(req.body)
+    const SaveUser = new UserModel({
+        email:req.body.email,
+        password:md5(req.body.password)
+    })
     SaveUser.save((error, savedUser) => {
-        // if (error) throw error
-        // res.json(savedUser)
-        // // res.render('secrets')
+
         if (err) {
             console.log(err);
         }
@@ -44,7 +45,7 @@ app.post('/create-user', (req, res) => {
 },
     app.post('/user-login', (req, res) => {
         const username = req.body.usernameLogin;
-        const password = req.body.passwordLogin;
+        const password = md5(req.body.passwordLogin);
         userModel.findOne({ email: req.body.usernameLogin }, function (err, foundUser) {
             if (err) {
                 console.log("an error occurred !" + err);
@@ -53,10 +54,10 @@ app.post('/create-user', (req, res) => {
                 if (foundUser) {
                     console.log(req.body.passwordLogin);
 
-                    if (foundUser.password === req.body.passwordLogin) {
+                    if (foundUser.password === md5(req.body.passwordLogin)) {
                         res.render('secrets');
                         return;
-                    } else {
+                    } else { 
                         console.log("user found but password did not match")
                     }
                 }
@@ -73,6 +74,5 @@ app.listen(port, function (err) {
     else {
         console.log("app running at port number" + port);
     }
-
 
 })
