@@ -72,7 +72,7 @@ app.listen(port, function (err) {
 
     }
     else {
-        console.log("app running at port number" + port);
+        console.log("app running at port number " + port);
     }
 
 })
