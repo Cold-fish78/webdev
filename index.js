@@ -1,6 +1,8 @@
 require('dotenv').config();
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
 const bodyParser = require('body-parser');
-const md5 = require('md5');
+// const md5 = require('md5');
 const express = require('express');
 const UserModel = require('./model/user');
 const app = express();
@@ -27,39 +29,44 @@ app.get('/register', (req, res) => {
     res.render('register');
 });
 app.post('/create-user', (req, res) => {
-    const SaveUser = new UserModel({
-        email:req.body.email,
-        password:md5(req.body.password)
-    })
-    SaveUser.save((error, savedUser) => {
-
-        if (err) {
-            console.log(err);
+    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+        // Store hash in your password DB.
+        const SaveUser = new UserModel({
+            email:req.body.email,
+            password:hash
+        })
+        SaveUser.save((error, savedUser) => {
+    
+            if (err) {
+                console.log(err);
+            }
+            else {
+                res.render('secrets');
+            }
         }
-        else {
-            res.render('secrets');
-        }
-    }
-    )
+        )
+    });
+    
     res.render('secrets');
 },
     app.post('/user-login', (req, res) => {
-        const username = req.body.usernameLogin;
-        const password = md5(req.body.passwordLogin);
-        userModel.findOne({ email: req.body.usernameLogin }, function (err, foundUser) {
+        const username1 = req.body.usernameLogin;
+        const password1 =req.body.passwordLogin;
+        userModel.findOne({ email:username1 }, function (err, foundUser) {
             if (err) {
                 console.log("an error occurred !" + err);
             }
             else {
                 if (foundUser) {
-                    console.log(req.body.passwordLogin);
+                    bcrypt.compare(password1, foundUser.password, function(err, result) {
+                        // result == true
+                        if(result === true){
+                            res.render('secrets');
 
-                    if (foundUser.password === md5(req.body.passwordLogin)) {
-                        res.render('secrets');
+                        }
+                    });
                         return;
-                    } else { 
-                        console.log("user found but password did not match")
-                    }
+                    
                 }
 
             }
@@ -72,7 +79,7 @@ app.listen(port, function (err) {
 
     }
     else {
-        console.log("app running at port number " + port);
+        console.log("app running at port number ..." + port);
     }
 
 })
