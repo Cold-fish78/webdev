@@ -29,14 +29,14 @@ app.get('/register', (req, res) => {
     res.render('register');
 });
 app.post('/create-user', (req, res) => {
-    bcrypt.hash(req.body.password, saltRounds, function(err, hash) {
+    bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
         // Store hash in your password DB.
         const SaveUser = new UserModel({
-            email:req.body.email,
-            password:hash
+            email: req.body.email,
+            password: hash
         })
         SaveUser.save((error, savedUser) => {
-    
+
             if (err) {
                 console.log(err);
             }
@@ -46,27 +46,27 @@ app.post('/create-user', (req, res) => {
         }
         )
     });
-    
+
     res.render('secrets');
 },
     app.post('/user-login', (req, res) => {
         const username1 = req.body.usernameLogin;
-        const password1 =req.body.passwordLogin;
-        userModel.findOne({ email:username1 }, function (err, foundUser) {
+        const password1 = req.body.passwordLogin;
+        userModel.findOne({ email: username1 }, function (err, foundUser) {
             if (err) {
                 console.log("an error occurred !" + err);
             }
             else {
                 if (foundUser) {
-                    bcrypt.compare(password1, foundUser.password, function(err, result) {
+                    bcrypt.compare(password1, foundUser.password, function (err, result) {
                         // result == true
-                        if(result === true){
+                        if (result === true) {
                             res.render('secrets');
 
                         }
                     });
-                        return;
-                    
+                    return;
+
                 }
 
             }
