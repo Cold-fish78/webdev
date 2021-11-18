@@ -20,6 +20,9 @@ const Auth = new mongoose.Schema({
   },
   googleId :{
     type: String
+  },
+  secret : {
+    type : String
   }
 
 });

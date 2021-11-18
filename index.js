@@ -71,11 +71,42 @@ app.get('/register', (req, res) => {
     res.render('register');
 });
 app.get('/secrets', (req, res) => {
+  userModel.find({"secret":{$ne :null}},function(err,foundUsers){
+      if(err){
+          console.log("error occured at 76");
+      }
+      else{
+          if(foundUsers){
+              res.render('secrets',{userWithSecrets :foundUsers})
+
+          }
+      }
+  })
+});
+app.get('/submit',function (req,res) {
     if (req.isAuthenticated()) {
-        res.render('secrets');
+        res.render('submit');
     } else {
         res.redirect('/login');
     }
+    
+});
+app.post('/submit',function (req,res) {
+    const submitted =req.body.secret1;
+    userModel.findById(req.user.id,function(err,foundUser){
+        if(err){
+            console.log("an error occured at " + err);
+        }
+        else{
+            if(foundUser){
+                foundUser.secret = submitted;
+                foundUser.save(function(){
+                    
+                    res.redirect('/secrets');
+                });
+            }
+        }
+    });
 });
 app.post('/create-user', (req, res) => {
     userModel.register({ username: req.body.username }, req.body.password, function (err, user) {
@@ -90,7 +121,7 @@ app.post('/create-user', (req, res) => {
             })
         }
     });
-});
+})
 app.post('/user-login', (req, res) => {
     const user = new userModel({
         username: req.body.username,
