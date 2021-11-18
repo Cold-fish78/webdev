@@ -90,7 +90,7 @@ app.post('/create-user', (req, res) => {
             })
         }
     });
-})
+});
 app.post('/user-login', (req, res) => {
     const user = new userModel({
         username: req.body.username,
